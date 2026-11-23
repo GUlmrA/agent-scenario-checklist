@@ -66,7 +66,7 @@
 ### 方式一：网页上传（不需要装 git）
 
 1. 在 GitHub 新建仓库，例如 `agent-scenario-checklist`，选 **Public**（私有仓库用 Pages 需要付费）；
-2. 进入仓库 → **Add file → Upload files**，把 `index.html`、`README.md`、`docs/` 一起拖进去，提交；
+2. 进入仓库 → **Add file → Upload files**，把 `index.html`、`README.md`、`preview.png`、`.gitignore` 一起拖进去，提交；
 3. **Settings → Pages** → Source 选 `Deploy from a branch`，Branch 选 `main`、目录选 `/ (root)`，保存；
 4. 等 1–2 分钟，访问：
 
