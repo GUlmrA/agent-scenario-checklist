@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Agent 场景评估 Checklist · 产品评审模板</title>
+<style>
+  :root{
+    --ink:#1b1f27; --ink2:#4a5160; --ink3:#7d8595; --line:#e3e6ec; --bg:#f6f7f9; --card:#ffffff;
+    --d1:#E29A33; --d2:#2F5FD0; --d3:#3E9E6B; --d4:#E2703A; --z:#6B5BD6;
+    --ok:#3E9E6B; --warn:#E29A33; --bad:#D9534F;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Source Han Sans SC",system-ui,-apple-system,"Segoe UI",sans-serif;
+    font-size:14px; line-height:1.7; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px; margin:0 auto; padding:28px 24px 64px}
+
+  /* ---------- header ---------- */
+  header.top{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px 26px 18px; margin-bottom:18px}
+  h1{font-size:26px; line-height:1.3; margin:0 0 6px; letter-spacing:.2px}
+  .sub{color:var(--ink3); font-size:14px; margin:0 0 18px}
+  .meta{display:grid; grid-template-columns:2fr 1fr 1fr; gap:14px; padding-top:14px; border-top:1px dashed var(--line)}
+  .field label{display:block; font-size:12px; color:var(--ink3); margin-bottom:4px; letter-spacing:.3px}
+  .field input{width:100%; padding:7px 10px; border:1px solid var(--line); border-radius:8px; font:inherit; font-size:14px; color:var(--ink); background:#fcfcfd}
+  .field input:focus{outline:none; border-color:var(--d2); box-shadow:0 0 0 3px rgba(47,95,208,.12)}
+
+  /* ---------- toolbar ---------- */
+  .bar{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:16px 0 0}
+  button{font:inherit; font-size:13px; padding:7px 14px; border-radius:8px; border:1px solid var(--line); background:var(--card); color:var(--ink2); cursor:pointer}
+  button:hover{border-color:#c9ced8; color:var(--ink)}
+  button.primary{background:var(--ink); border-color:var(--ink); color:#fff}
+  button.primary:hover{opacity:.88; color:#fff}
+  .bar .spacer{flex:1}
+  .savehint{font-size:12px; color:var(--ink3)}
+
+  /* ---------- progress ---------- */
+  .progress{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 22px; margin-bottom:18px; display:flex; align-items:center; gap:18px; flex-wrap:wrap}
+  .track{flex:1; min-width:180px; height:8px; background:#eef0f4; border-radius:99px; overflow:hidden}
+  .fill{height:100%; width:0; background:linear-gradient(90deg,var(--d2),#5B8DEF); transition:width .25s}
+  .pcount{font-size:13px; color:var(--ink2); white-space:nowrap}
+  .chips{display:flex; gap:8px; flex-wrap:wrap}
+  .chip{font-size:12px; padding:4px 10px; border-radius:99px; border:1px solid var(--line); color:var(--ink3); white-space:nowrap}
+  .chip.ok{color:var(--ok); border-color:#bfe3cf; background:#f2fbf6}
+  .chip.bad{color:var(--bad); border-color:#f0cfce; background:#fdf5f5}
+  .chip.todo{color:var(--warn); border-color:#f0dcb4; background:#fdf9f0}
+
+  /* ---------- cards ---------- */
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+  .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr} .meta{grid-template-columns:1fr} .grid3{grid-template-columns:1fr}}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:14px; overflow:hidden; margin-bottom:18px}
+  .card > .topbar{height:5px; background:var(--accent)}
+  .card .chead{display:flex; align-items:center; justify-content:space-between; padding:16px 22px 10px; gap:12px}
+  .card h2{font-size:17px; margin:0; letter-spacing:.2px}
+  .card .star{color:var(--d2); font-size:15px; margin-left:4px}
+  .card .body{padding:4px 22px 18px}
+  .lead{font-size:13.5px; color:var(--ink2); margin:2px 0 14px; line-height:1.75}
+  .lead b{color:var(--ink)}
+  .zcard{border:1px solid var(--line); border-radius:11px; padding:14px 16px; background:#fcfcfd; display:flex; flex-direction:column}
+  .zcard h3{font-size:14.5px; margin:0 0 5px; letter-spacing:.2px}
+  .zcard .zhint{font-size:12.5px; color:var(--ink3); line-height:1.7; margin-bottom:11px; flex:1}
+  .zhint .core{font-size:13px; color:var(--ink2); line-height:1.6; margin-bottom:9px}
+  .zhint .core b{color:var(--ink)}
+  .zhint .ln{display:flex; gap:5px; font-size:12px; line-height:1.6; margin-top:5px}
+  .zhint .ln .k{flex:none; font-weight:700}
+  .zhint .k.y{color:var(--ok)} .zhint .k.n{color:var(--bad)} .zhint .k.m{color:var(--warn)}
+  .selftest{margin:-4px 0 14px; padding:9px 14px; border-left:3px solid var(--z); background:#f8f7ff; border-radius:0 9px 9px 0; font-size:12.5px; color:var(--ink2); line-height:1.7}
+  .selftest b{color:var(--ink)}
+  .selftest .seg{display:inline-block; white-space:nowrap; margin-right:16px}
+  .zcard input[type=text]{width:100%; margin-top:11px; padding:6px 9px; border:1px solid var(--line); border-radius:7px; font:inherit; font-size:12.5px; background:#fff; color:var(--ink)}
+  .zcard input[type=text]:focus{outline:none; border-color:var(--z); background:#fff}
+  .zsum{margin-top:14px; padding:10px 14px; border:1px solid var(--line); border-radius:10px; background:#fafbfc; font-size:13.5px; color:var(--ink2)}
+  .zsum b{color:var(--ink)}
+
+  .q{padding:11px 0; border-bottom:1px solid #f0f2f6}
+  .q:last-child{border-bottom:none}
+  .qtext{display:flex; gap:9px; align-items:flex-start; margin-bottom:8px; font-size:14.5px}
+  .qtext .idx{color:var(--ink3); font-size:12px; margin-top:3px; min-width:16px}
+  .qtext .hint{color:var(--ink3); font-size:12px; display:block; margin-top:2px}
+  .opts{display:flex; gap:8px; flex-wrap:wrap}
+  .opt{position:relative; cursor:pointer; user-select:none}
+  .opt input{position:absolute; opacity:0; width:0; height:0}
+  .opt span{display:inline-flex; align-items:center; gap:6px; border:1px solid var(--line); border-radius:8px; padding:5px 13px; font-size:13px; color:var(--ink2); background:#fcfcfd; transition:.12s}
+  .opt input:checked + span{border-color:var(--accent,var(--d2)); background:var(--tint,rgba(47,95,208,.08)); color:var(--ink); font-weight:600}
+  .opt:hover span{border-color:#c9ced8}
+  .opt input:focus-visible + span{box-shadow:0 0 0 3px rgba(47,95,208,.2)}
+  .opt .desc{display:block; font-size:11.5px; color:var(--ink3); font-weight:400; margin-top:1px}
+  .opt.stack{display:block}
+  .opt.stack span{display:block; padding:8px 12px; line-height:1.5}
+
+  /* 排除项 */
+  .excl{margin-top:14px; border:1px dashed #d6cbee; background:#faf9ff; border-radius:11px; padding:13px 16px}
+  .excl .et{font-size:14px; font-weight:600; margin-bottom:2px}
+  .excl .eh{font-size:12.5px; color:var(--ink3); margin-bottom:9px}
+
+  /* test table */
+  .test{margin-top:6px; border:1px solid var(--line); border-radius:10px; overflow:hidden}
+  .test .thead{display:grid; grid-template-columns:26px 1fr 58px 58px 66px 1fr; background:#fafbfc; border-bottom:1px solid var(--line); font-size:11.5px; color:var(--ink3); padding:8px 12px; text-align:center}
+  .test .thead span:first-child,.test .thead span:nth-child(2),.test .thead span:last-child{text-align:left}
+  .test .row{display:grid; grid-template-columns:26px 1fr 58px 58px 66px 1fr; align-items:center; padding:7px 12px; border-bottom:1px solid #f2f4f7}
+  .test .row:last-child{border-bottom:none}
+  .test .row .no{color:var(--ink3); font-size:12px}
+  .test input[type=text]{width:100%; border:1px solid transparent; background:transparent; padding:4px 6px; border-radius:6px; font:inherit; font-size:13.5px; color:var(--ink)}
+  .test input[type=text]:hover{border-color:var(--line)}
+  .test input[type=text]:focus{outline:none; border-color:var(--d2); background:#fff}
+  .mini{display:flex; gap:4px; justify-content:center}
+  .mini label{cursor:pointer; position:relative}
+  .mini input{position:absolute; opacity:0; width:0; height:0}
+  .mini span{display:block; width:25px; text-align:center; border:1px solid var(--line); border-radius:6px; font-size:12.5px; color:var(--ink3); background:#fcfcfd}
+  .mini label.y input:checked + span{border-color:var(--ok); background:#f2fbf6; color:var(--ok); font-weight:700}
+  .mini label.n input:checked + span{border-color:var(--bad); background:#fdf5f5; color:var(--bad); font-weight:700}
+  .score{display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-top:10px; font-size:13px; color:var(--ink2); padding:10px 12px; background:#fafbfc; border:1px solid var(--line); border-radius:10px}
+  .score b{font-size:17px; color:var(--ink)}
+  .score input[type=number]{width:60px; padding:4px 8px; border:1px solid var(--line); border-radius:6px; font:inherit; font-size:13px; text-align:center}
+  .score .sub{color:var(--ink3); font-size:12.5px}
+
+  .notes{margin-top:12px}
+  .notes label{display:block; font-size:12px; color:var(--ink3); margin-bottom:5px}
+  .notes textarea{width:100%; min-height:60px; resize:vertical; padding:9px 11px; border:1px solid var(--line); border-radius:9px; font:inherit; font-size:13.5px; color:var(--ink); background:#fcfcfd}
+  .notes textarea:focus{outline:none; border-color:var(--d2); background:#fff; box-shadow:0 0 0 3px rgba(47,95,208,.10)}
+
+  /* ---------- decision ---------- */
+  .decision{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px 26px; margin-top:6px}
+  .decision h2{font-size:17px; margin:0 0 4px}
+  .dhead{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin:12px 0 6px}
+  .badge{font-size:15px; font-weight:700; padding:9px 16px; border-radius:10px; border:1px solid}
+  .badge.go{color:#2E7D57; border-color:#bfe3cf; background:#f2fbf6}
+  .badge.build{color:#2A56B8; border-color:#c4d5f5; background:#f3f6fe}
+  .badge.research{color:#B67A19; border-color:#f0dcb4; background:#fdf9f0}
+  .badge.redesign{color:#C0562A; border-color:#f3cfc0; background:#fdf5f1}
+  .badge.simple{color:#5A6272; border-color:#d8dce4; background:#f5f6f8}
+  .badge.todo{color:#5A6272; border-color:#d8dce4; background:#f5f6f8}
+  .why{font-size:13.5px; color:var(--ink2); margin:6px 0 14px}
+  .why li{margin:3px 0}
+  .nextbox{border:1px solid var(--line); border-radius:10px; padding:14px 16px; background:#fafbfc}
+  .nextbox h3{font-size:13.5px; margin:0 0 8px; color:var(--ink)}
+  .nextbox ol{margin:0; padding-left:20px; font-size:13.5px; color:var(--ink2)}
+  .nextbox ol li{margin:4px 0}
+  .final{margin-top:14px}
+  .final label{display:block; font-size:12px; color:var(--ink3); margin-bottom:5px}
+  .final textarea{width:100%; min-height:76px; resize:vertical; padding:10px 12px; border:1px solid var(--line); border-radius:9px; font:inherit; font-size:13.5px; background:#fcfcfd}
+
+  /* 一键生成结论 */
+  .dhead .genbtn{margin-left:auto}
+  .genpanel{border:1px solid var(--line); border-radius:11px; background:#fafbfc; margin:14px 0 4px; overflow:hidden}
+  .genpanel[hidden]{display:none}
+  .ghead{display:flex; align-items:center; gap:10px; padding:9px 14px; border-bottom:1px solid var(--line); background:#f5f6f9; font-size:12.5px; color:var(--ink3)}
+  .ghead .sp{flex:1}
+  .ghead button{padding:4px 10px; font-size:12px}
+  .genpanel pre{margin:0; padding:14px 16px; font-family:inherit; font-size:13px; line-height:1.8; color:var(--ink2); white-space:pre-wrap; word-break:break-word; max-height:420px; overflow:auto}
+
+  /* ---------- 课后行动 ---------- */
+  .actions{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:20px 24px; margin-top:16px}
+  .actions h2{font-size:16px; margin:0 0 12px}
+  .acts{list-style:none; padding:0; margin:0}
+  .acts li{display:flex; gap:11px; align-items:flex-start; padding:9px 0; border-bottom:1px dashed #eef0f4; font-size:13.5px; color:var(--ink2)}
+  .acts li:last-child{border-bottom:none}
+  .acts .n{flex:0 0 22px; height:22px; border-radius:7px; background:var(--z); color:#fff; font-size:12px; display:flex; align-items:center; justify-content:center; margin-top:2px}
+  .acts .tx b{color:var(--ink); font-weight:600}
+  .acts .tx .hint2{display:block; color:var(--ink3); font-size:12.5px; margin-top:2px}
+  .invest{margin-top:14px; border:1px solid var(--line); border-radius:11px; padding:14px 16px; background:#fafbfc}
+  .invest .it{font-size:13.5px; font-weight:600; margin-bottom:3px}
+  .invest .ih{font-size:12.5px; color:var(--ink3); margin-bottom:9px}
+  .invest .sug{font-size:13px; color:var(--ink2); margin-bottom:9px}
+  .invest .sug b{color:var(--ink)}
+  .invest textarea{width:100%; min-height:58px; resize:vertical; padding:9px 11px; border:1px solid var(--line); border-radius:9px; font:inherit; font-size:13.5px; background:#fcfcfd}
+
+  .foot{margin-top:18px; font-size:12px; color:var(--ink3); line-height:1.8}
+
+  @media print{
+    body{background:#fff}
+    .wrap{max-width:none; padding:0}
+    .bar, .foot .no-print{display:none !important}
+    .card, .decision, header.top, .progress, .actions{break-inside:avoid}
+    .grid{gap:12px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>Agent 场景评估 Checklist</h1>
+    <p class="sub">产品评审时，10 分钟快速过一遍 —— 先排除不适合的场景，再按「数据可得性 → 任务可定义性 → 流程编排」过三道关；编排上先 Workflow，再 Agent，逐步增加自主性。</p>
+    <div class="meta">
+      <div class="field"><label>评审场景 / 产品</label><input type="text" data-bind="meta.scene" placeholder="例：信贷材料审核 Agent" /></div>
+      <div class="field"><label>评审人</label><input type="text" data-bind="meta.reviewer" placeholder="姓名" /></div>
+      <div class="field"><label>日期</label><input type="text" data-bind="meta.date" placeholder="YYYY-MM-DD" /></div>
+    </div>
+    <div class="bar">
+      <button class="primary" data-act="copy">复制评审结论</button>
+      <button data-act="print">打印 / 存 PDF</button>
+      <button data-act="export">导出 JSON</button>
+      <button data-act="import">导入 JSON</button>
+      <button data-act="reset">清空重填</button>
+      <span class="spacer"></span>
+      <span class="savehint" id="savehint">内容自动保存在本机浏览器</span>
+      <input type="file" id="filein" accept="application/json" hidden />
+    </div>
+  </header>
+
+  <div class="progress">
+    <div class="track"><div class="fill" id="fill"></div></div>
+    <div class="pcount" id="pcount">已判断 0 / 20 项</div>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <!-- 第 0 关：排除不适合的场景 -->
+  <section class="card" style="--accent:var(--z); --tint:rgba(107,91,214,.10)">
+    <div class="topbar"></div>
+    <div class="chead">
+      <h2>第 0 关 · 是不是「甜区」（先排除不适合的场景）</h2>
+      <span class="chip" id="chip-z">待填</span>
+    </div>
+    <div class="body">
+      <p class="lead">不是所有需求都需要 Agent。三个甜区里<b>同时命中两个甚至三个</b> → 大概率值得用 Agent；只命中一个，先别急着上。但「适合做」只是第一步，还得往下过三道可行性关卡。</p>
+      <div class="selftest">拿不准就问三句：<span class="seg"><b>① 他说的话，得先猜什么意思吗？</b>（得猜 → 甜区 1）</span><span class="seg"><b>② 看完还得建、发、改吗？</b>（要动手 → 甜区 2）</span><span class="seg"><b>③ 一句话说不全，得追问吗？</b>（要追问 → 甜区 3）</span></div>
+      <div class="grid3">
+        <div class="zcard">
+          <h3>甜区 1 · 语义理解</h3>
+          <div class="zhint">
+            <div class="core">判断依据：<b>一句话能有好几种讲法，系统里却没字段能替他定</b> —— 只能靠读他的话猜。</div>
+            <div class="ln"><span class="k y">命中</span><span>「这个能不能报」——系统里没有「单据类型」可读，只能猜他问的是报销、报备还是额度</span></div>
+            <div class="ln"><span class="k n">不命中</span><span>同一句话，但能读到「单据类型=报销」，规则直接分流，不用猜</span></div>
+            <div class="ln"><span class="k m">易混</span><span>需求文档写得糙不算（那是需求问题，先澄清）；文档长、术语多也不算（那是知识库的事）</span></div>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="z1" data-bind="zone.s1" value="yes"><span>命中</span></label>
+            <label class="opt"><input type="radio" name="z1" data-bind="zone.s1" value="partial"><span>部分命中</span></label>
+            <label class="opt"><input type="radio" name="z1" data-bind="zone.s1" value="no"><span>不命中</span></label>
+          </div>
+          <input type="text" data-bind="zone.ex1" placeholder="业务证据：例：用户只说「这个能不能报」，答案取决于差旅/市场/项目类型">
+        </div>
+        <div class="zcard">
+          <h3>甜区 2 · 外部工具调用</h3>
+          <div class="zhint">
+            <div class="core">判断依据：<b>看一眼不算，得进去建、发、改</b> —— 而且查到什么，决定下一步做什么。</div>
+            <div class="ln"><span class="k y">命中</span><span>看到客户投诉 → 建工单 → 派给人 → 回消息告知，四步连着走</span></div>
+            <div class="ln"><span class="k n">不命中</span><span>只把群消息总结一下，看完就结束，一个字都没动</span></div>
+            <div class="ln"><span class="k m">易混</span><span>接了很多系统不算；只查一次、调一个接口就够的，不算</span></div>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="z2" data-bind="zone.s2" value="yes"><span>命中</span></label>
+            <label class="opt"><input type="radio" name="z2" data-bind="zone.s2" value="partial"><span>部分命中</span></label>
+            <label class="opt"><input type="radio" name="z2" data-bind="zone.s2" value="no"><span>不命中</span></label>
+          </div>
+          <input type="text" data-bind="zone.ex2" placeholder="业务证据：例：要跨 3 个系统查+建+发，步骤随查到的情况变">
+        </div>
+        <div class="zcard">
+          <h3>甜区 3 · 持续交互</h3>
+          <div class="zhint">
+            <div class="core">判断依据：<b>他说一句不够，你得追问两三轮</b> —— 后一句靠前一句，才办得下去。</div>
+            <div class="ln"><span class="k y">命中</span><span>「我要报这个」→ 问哪种、多少钱、什么由头，第三轮才定得下来</span></div>
+            <div class="ln"><span class="k n">不命中</span><span>第一条消息就参数齐全，一次问完就能办</span></div>
+            <div class="ln"><span class="k m">易混</span><span>能闲聊不算；一轮就结束、不用记前文的，不算</span></div>
+          </div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="z3" data-bind="zone.s3" value="yes"><span>命中</span></label>
+            <label class="opt"><input type="radio" name="z3" data-bind="zone.s3" value="partial"><span>部分命中</span></label>
+            <label class="opt"><input type="radio" name="z3" data-bind="zone.s3" value="no"><span>不命中</span></label>
+          </div>
+          <input type="text" data-bind="zone.ex3" placeholder="业务证据：例：一次问不清，要追问 3 轮才能定口径">
+        </div>
+      </div>
+
+      <div class="excl">
+        <div class="et">排除项 · 能否用 if-else 完整描述？</div>
+        <div class="eh">答「是」→ 规则就能写死，直接用更简单的方案，不用 Agent。答「否」→ 规则写不完，才谈得上 Agent。</div>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="excl" data-bind="excl" value="yes"><span>是 · 规则能写死</span></label>
+          <label class="opt"><input type="radio" name="excl" data-bind="excl" value="no"><span>否 · 规则写不完</span></label>
+        </div>
+      </div>
+
+      <div class="zsum" id="zsum">甜区未判：先看这三个 —— 命中 2 个及以上，才值得往下做可行性评估。</div>
+    </div>
+  </section>
+
+  <div class="grid">
+
+    <!-- 一、数据可得性 -->
+    <section class="card" style="--accent:var(--d2); --tint:rgba(47,95,208,.09)">
+      <div class="topbar"></div>
+      <div class="chead"><h2>一、数据可得性 <span class="star">★</span></h2><span class="chip" id="chip-d2">待填</span></div>
+      <div class="body">
+        <div class="q">
+          <div class="qtext"><span class="idx">1.1</span><span>答案数据存在吗？<span class="hint">能否查到「正确答案」本身</span></span></div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="d2a" data-bind="q.d2a" value="yes"><span>是 · 可取到</span></label>
+            <label class="opt"><input type="radio" name="d2a" data-bind="q.d2a" value="no"><span>否 · 缺数据</span></label>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="qtext"><span class="idx">1.2</span><span>数据是最新的吗？<span class="hint">时效、覆盖率、口径是否与线上一致</span></span></div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="d2b" data-bind="q.d2b" value="yes"><span>是 · 够新</span></label>
+            <label class="opt"><input type="radio" name="d2b" data-bind="q.d2b" value="no"><span>否 · 过期 / 口径不一致</span></label>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="qtext"><span class="idx">1.3</span><span>列 10 个典型问题，逐题检查答案数据<span class="hint">三个子检查：是否存在 · 是否准确 · 是否可接入；三格全 ✓ 才算这题能用</span></span></div>
+          <div class="test">
+            <div class="thead"><span>#</span><span>典型问题</span><span>存在</span><span>准确</span><span>可接入</span><span>备注 / 卡在哪</span></div>
+            <div id="testrows"></div>
+          </div>
+          <div class="score">
+            <span>可用题数 <b id="score">0</b> / 10（三格全 ✓）&nbsp;·&nbsp; 达标线 <input type="number" id="thr" min="0" max="10" value="8" /> 题</span>
+            <span class="sub" id="scorestate">未测</span>
+          </div>
+          <div class="score" style="margin-top:8px">
+            <span class="sub" id="detail">存在 0/10 · 准确 0/10 · 可接入 0/10</span>
+          </div>
+        </div>
+
+        <div class="notes"><label>证据 / 备注</label><textarea data-bind="notes.d2" placeholder="例：10 题里 8 题需要 3 张表 join，2 题口径定义本身有争议"></textarea></div>
+      </div>
+    </section>
+
+    <!-- 二、任务可定义性 -->
+    <section class="card" style="--accent:var(--d3); --tint:rgba(62,158,107,.10)">
+      <div class="topbar"></div>
+      <div class="chead"><h2>二、任务可定义性</h2><span class="chip" id="chip-d3">待填</span></div>
+      <div class="body">
+        <div class="q">
+          <div class="qtext"><span class="idx">2.1</span><span>能一句话描述「做对了」的标准吗？</span></div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="d3a" data-bind="q.d3a" value="yes"><span>是 · 能说清</span></label>
+            <label class="opt"><input type="radio" name="d3a" data-bind="q.d3a" value="no"><span>否 · 说不清</span></label>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="qtext"><span class="idx">2.2</span><span>评估标准是客观的还是主观的？<span class="hint">客观 = 有唯一正确答案 / 可自动核验；主观 = 需要人判断「好不好」</span></span></div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="d3b" data-bind="q.d3b" value="yes"><span>客观 · 可自动核验</span></label>
+            <label class="opt"><input type="radio" name="d3b" data-bind="q.d3b" value="no"><span>主观 · 依赖人工判断</span></label>
+          </div>
+        </div>
+
+        <div class="notes"><label>「做对了」的一句话标准</label><textarea data-bind="notes.d3" placeholder="例：给出的授信建议与最终审批结论一致，且引用了全部命中的规则条款"></textarea></div>
+      </div>
+    </section>
+
+    <!-- 三、流程编排 -->
+    <section class="card" style="--accent:var(--d4); --tint:rgba(226,112,58,.10)">
+      <div class="topbar"></div>
+      <div class="chead"><h2>三、流程编排</h2><span class="chip" id="chip-d4">待填</span></div>
+      <div class="body">
+        <div class="q">
+          <div class="qtext"><span class="idx">3.1</span><span>编排路线选哪一档？<span class="hint">先 Workflow，再 Agent —— 逐步增加自主性，不要一上来就全 Agent</span></span></div>
+          <div class="opts" style="flex-direction:column; gap:7px">
+            <label class="opt stack"><input type="radio" name="d4a" data-bind="q.d4a" value="A"><span><b>A · 全 Workflow</b>：步骤固定、规则能写死，不需要 Agent<span class="desc">例：取数 → 校验 → 出结论，每步都是确定逻辑</span></span></label>
+            <label class="opt stack"><input type="radio" name="d4a" data-bind="q.d4a" value="B"><span><b>B · Workflow + Agent 单点</b>：流程固定，中间 1~2 步交给模型判断（推荐起点）<span class="desc">例：流程写死，把「判断意图/匹配规则」那一步交给 Agent，输出后再做程序化校验</span></span></label>
+            <label class="opt stack"><input type="radio" name="d4a" data-bind="q.d4a" value="C"><span><b>C · Agent 自主编排</b>：步骤随输入变化，由 Agent 自己决定调什么工具、怎么组合<span class="desc">自主性最高、稳定性最低，出错代价大时慎选</span></span></label>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="qtext"><span class="idx">3.2</span><span>AI 出错的后果是什么？</span></div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="d4b" data-bind="q.d4b" value="low"><span>可容忍 · 不影响结果</span></label>
+            <label class="opt"><input type="radio" name="d4b" data-bind="q.d4b" value="mid"><span>需复核 · 人工兜底</span></label>
+            <label class="opt"><input type="radio" name="d4b" data-bind="q.d4b" value="high"><span>不可接受 · 直接对外</span></label>
+          </div>
+        </div>
+
+        <div class="notes"><label>证据 / 备注</label><textarea data-bind="notes.d4" placeholder="例：流程固定为 取数→校验→出结论，模型只负责中间的模糊判断"></textarea></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 结论 -->
+  <section class="decision">
+    <h2>评审结论</h2>
+    <div class="dhead">
+      <span class="badge todo" id="badge">待补全</span>
+      <span id="summary" style="color:var(--ink2); font-size:13.5px"></span>
+      <button class="genbtn" data-act="gen">一键生成结论</button>
+    </div>
+    <div class="why"><ul id="why"></ul></div>
+    <div class="nextbox">
+      <h3>下一步动作</h3>
+      <ol id="next"></ol>
+    </div>
+
+    <div class="genpanel" id="genpanel" hidden>
+      <div class="ghead">
+        <span>生成的结论 · 可直接粘进纪要</span><span class="sp"></span>
+        <button data-act="gencopy">复制这段</button>
+        <button data-act="genhide">收起</button>
+      </div>
+      <pre id="gentext"></pre>
+    </div>
+    <div class="final">
+      <label>人工补充结论 / 遗留问题（会一并复制出去）</label>
+      <textarea data-bind="meta.action" placeholder="例：本次先建数据，不进 Agent 排期；数据口径由数据组 3 月底前对齐后重新评审"></textarea>
+    </div>
+  </section>
+
+  <!-- 课后行动 -->
+  <section class="actions">
+    <h2>课后行动</h2>
+    <ul class="acts">
+      <li><span class="n">1</span><span class="tx"><b>从 backlog 中找一个 AI 需求，用本表评估</b><span class="hint2">填上方「评审场景」→ 从第 0 关开始，10 分钟能过完一遍</span></span></li>
+      <li><span class="n">2</span><span class="tx"><b>列 10 个典型问题，逐一检查答案数据是否存在、准确、可接入</b><span class="hint2">对应「一、数据可得性」的 10 题表：三个子检查全 ✓ 才算这题能用</span></span></li>
+      <li><span class="n">3</span><span class="tx"><b>和团队讨论：当前最该投资的是模型层还是数据层？</b><span class="hint2">结论区已按你的判定给出一个倾向，写在下面即可</span></span></li>
+    </ul>
+    <div class="invest">
+      <div class="it">模型层 vs 数据层 · 投资倾向</div>
+      <div class="ih">按本表结论自动给一个倾向，最终以团队讨论为准。</div>
+      <div class="sug" id="sug">填完前面的判定后，这里会给出倾向。</div>
+      <textarea data-bind="meta.invest" placeholder="例：当前数据层更值得投 —— 10 题里 7 题卡在「可接入」，模型再强也答不对"></textarea>
+    </div>
+  </section>
+
+  <div class="foot">
+    判定顺序：<b>第 0 关先排除不适合的场景</b>（甜区命中 ≥2 且规则写不完）→ <b>① 数据可得性</b>（永远排第一位）→ <b>② 任务可定义性</b> → <b>③ 流程编排</b>（先 Workflow，再 Agent，逐步增加自主性）。<br/>
+    甜区＝语义理解 / 外部工具调用 / 持续交互（命中计 1，部分命中计 0.5）；数据可得性达标线默认 8/10，可调整。<br/>
+    内容自动保存在本机浏览器，刷新不丢；换设备可用「导出 / 导入 JSON」搬运。勾选状态不上传任何服务器。
+  </div>
+</div>
+
+<script>
+(function(){
+  var KEY = 'agent-scene-checklist-v2';
+  var state = {
+    meta:{scene:'',reviewer:'',date:'',action:'',invest:''},
+    q:{d2a:'',d2b:'',d3a:'',d3b:'',d4a:'',d4b:''},
+    zone:{s1:'',s2:'',s3:'',ex1:'',ex2:'',ex3:''},
+    excl:'',
+    test:Array.from({length:10},function(){return {q:'',ex:'',acc:'',ok:'',note:''};}),
+    notes:{d2:'',d3:'',d4:''},
+    thr:8
+  };
+  var ZONE = [
+    {key:'s1', ex:'ex1', name:'语义理解'},
+    {key:'s2', ex:'ex2', name:'外部工具调用'},
+    {key:'s3', ex:'ex3', name:'持续交互'}
+  ];
+  var ROUTE = {A:'A · 全 Workflow', B:'B · Workflow + Agent 单点', C:'C · Agent 自主编排'};
+
+  /* ---------- 10 题测试行 ---------- */
+  var rows = document.getElementById('testrows');
+  for(var i=0;i<10;i++){
+    (function(i){
+      var r = document.createElement('div'); r.className='row';
+      function mini(key,cls){ return '<span class="mini"><label class="y"><input type="radio" name="t'+i+'_'+key+'" data-test="'+i+'.'+key+'" value="pass"><span>✓</span></label>'+
+                                     '<label class="n"><input type="radio" name="t'+i+'_'+key+'" data-test="'+i+'.'+key+'" value="fail"><span>✗</span></label></span>'; }
+      r.innerHTML =
+        '<span class="no">'+(i+1)+'</span>'+
+        '<input type="text" data-test="'+i+'.q" placeholder="写下要测的真实问题">'+
+        mini('ex')+ mini('acc')+ mini('ok')+
+        '<input type="text" data-test="'+i+'.note" placeholder="错在哪 / 缺什么">';
+      rows.appendChild(r);
+    })(i);
+  }
+
+  /* ---------- 存取 ---------- */
+  function load(){
+    try{
+      var raw = localStorage.getItem(KEY); if(!raw) return;
+      var s = JSON.parse(raw);
+      if(s.meta) Object.assign(state.meta, s.meta);
+      if(s.q) Object.assign(state.q, s.q);
+      if(s.zone) Object.assign(state.zone, s.zone);
+      if(typeof s.excl==='string') state.excl = s.excl;
+      if(s.notes) Object.assign(state.notes, s.notes);
+      if(typeof s.thr==='number') state.thr = s.thr;
+      if(Array.isArray(s.test)) s.test.forEach(function(t,j){ if(state.test[j]) state.test[j]=t; });
+    }catch(e){}
+  }
+  function save(){
+    try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){}
+    document.getElementById('savehint').textContent='已保存 '+new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+  }
+
+  /* ---------- 绑定 ---------- */
+  function pathGet(p){ var o=state; p.split('.').forEach(function(k){ o=o[k]; }); return o; }
+  function pathSet(p,v){ var ks=p.split('.'), o=state; for(var i=0;i<ks.length-1;i++) o=o[ks[i]]; o[ks[ks.length-1]]=v; }
+
+  document.addEventListener('input', function(e){
+    var t=e.target;
+    if(t.dataset && t.dataset.bind){ pathSet(t.dataset.bind, t.value); save(); render(); }
+    if(t.dataset && t.dataset.test){ pathSet('test.'+t.dataset.test, t.value); save(); render(); }
+    if(t.id==='thr'){ state.thr = Math.max(0,Math.min(10, parseInt(t.value||'0',10))); save(); render(); }
+  });
+  document.addEventListener('change', function(e){
+    var t=e.target;
+    if(t.dataset && t.dataset.bind){ pathSet(t.dataset.bind, t.value); save(); render(); }
+    if(t.dataset && t.dataset.test){ pathSet('test.'+t.dataset.test, t.value); save(); render(); }
+  });
+
+  function fill(){
+    document.querySelectorAll('[data-bind]').forEach(function(el){
+      var v = pathGet(el.dataset.bind);
+      if(el.type==='radio'){ el.checked = (el.value===v); } else { el.value = v==null?'':v; }
+    });
+    document.querySelectorAll('[data-test]').forEach(function(el){
+      var v = pathGet('test.'+el.dataset.test);
+      if(el.type==='radio'){ el.checked=(el.value===v); } else { el.value=v==null?'':v; }
+    });
+    document.getElementById('thr').value = state.thr;
+  }
+
+  /* ---------- 计算 ---------- */
+  function compute(){
+    var q=state.q, t=state.test, z=state.zone;
+    var exPass=0, accPass=0, okPass=0, usable=0, tested=0;
+    t.forEach(function(x){
+      if(x.ex==='pass') exPass++;
+      if(x.acc==='pass') accPass++;
+      if(x.ok==='pass') okPass++;
+      if(x.ex||x.acc||x.ok) tested++;
+      if(x.ex==='pass'&&x.acc==='pass'&&x.ok==='pass') usable++;
+    });
+    var answered = Object.keys(q).filter(function(k){return q[k]!=='';}).length;
+    var zVals = ZONE.map(function(zd){return z[zd.key];});
+    var zYes = zVals.filter(function(v){return v==='yes';}).length;
+    var zPart = zVals.filter(function(v){return v==='partial';}).length;
+    var zDone = zVals.filter(function(v){return v!=='';}).length;
+    var zFilled = zDone===ZONE.length;
+    var zHits = zYes + zPart*0.5;
+    var total = 3 + 1 + 6 + 10;
+    var done = zDone + (state.excl!==''?1:0) + answered + tested;
+
+    var d2pass = q.d2a==='yes'&&q.d2b==='yes'&&usable>=state.thr;
+    var d2filled = q.d2a!==''&&q.d2b!==''&&tested===10;
+    var d3pass = q.d3a==='yes'&&q.d3b==='yes';
+    var d3filled = q.d3a!==''&&q.d3b!=='';
+    var d4filled = q.d4a!==''&&q.d4b!=='';
+
+    return {usable:usable,tested:tested,exPass:exPass,accPass:accPass,okPass:okPass,
+      answered:answered,done:done,total:total,
+      z:{yes:zYes,part:zPart,filled:zFilled,hits:zHits,done:zDone},
+      d2:{pass:d2pass,filled:d2filled},d3:{pass:d3pass,filled:d3filled},d4:{filled:d4filled},q:q};
+  }
+  function zDesc(){
+    return ZONE.map(function(zd){
+      var v = state.zone[zd.key];
+      return zd.name+'：'+(v==='yes'?'命中':v==='partial'?'部分命中':v==='no'?'不命中':'未判');
+    }).join('；');
+  }
+  function fmtHits(n){ return (n%1===0)? String(n) : n.toFixed(1); }
+  function esc(s){return String(s).replace(/[&<>]/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[m];});}
+
+  /* ---------- 判定 ---------- */
+  function verdict(c){
+    var why=[], next=[], badge='todo', label='待补全', sum='';
+    var missing=[];
+
+    // 第 0 关
+    if(!c.z.filled || state.excl===''){
+      badge='todo'; label='待补全';
+      var miss=[];
+      if(!c.z.filled) miss.push('第 0 关甜区还有 '+(3-c.z.done)+' 项未判');
+      if(state.excl==='') miss.push('排除项（能否 if-else 完整描述）未选');
+      sum='还差：'+miss.join('；');
+      why.push('先过第 0 关 —— 这一关没过，后面三道可行性关卡不用填。');
+      next.push('甜区三项各判：命中 / 部分命中 / 不命中');
+      next.push('排除项：能否用 if-else 完整描述（能写死就别上 Agent）');
+      next.push('命中 2 个及以上且规则写不完，才继续往下');
+      return {badge:badge,label:label,sum:sum,why:why,next:next};
+    }
+    if(state.excl==='yes'){
+      badge='simple'; label='用更简单方案';
+      sum='这个场景现有规则就能完整描述 —— 上 Agent 只会多一层不确定性。';
+      why.push('排除项为「是」：if-else 能写完，不需要模型来猜。');
+      why.push('按本表顺序，这一步在所有可行性评估之前就该被拦下。');
+      next.push('先用规则/脚本做一版，把 ROI 算清楚');
+      next.push('只有当规则分支写不完、或必须跨源推理时，再回到本表重评');
+      next.push('不要为了用 AI 而用 AI，这一条是最贵的沉没成本');
+      return {badge:badge,label:label,sum:sum,why:why,next:next};
+    }
+    if(c.z.hits < 2){
+      var dimsFilled = c.d2.filled&&c.d3.filled&&c.d4.filled;
+      var dimsPass = c.d2.pass&&c.d3.pass&&c.q.d4a!=='A';
+      if(dimsFilled && dimsPass){
+        badge='research'; label='结论冲突 · 需复核';
+        sum='甜区只命中 '+fmtHits(c.z.hits)+'/3，但三道可行性关卡都过 —— 两处判断打架了，先复核再定。';
+        why.push('甜区判断：'+zDesc(c));
+        why.push('但数据可得性 / 任务可定义性 / 流程编排都过，说明它至少踩中了「语义理解」或「外部工具调用」之一。');
+        next.push('回第 0 关复核：是不是把「部分命中」判成了「不命中」');
+        next.push('若确实只命中 1 个甜区，说明这个场景的重点不在 Agent 的强项上');
+        next.push('复核后在「人工补充结论」里写明最终判断');
+        return {badge:badge,label:label,sum:sum,why:why,next:next};
+      }
+      badge='simple'; label='甜区命中不足';
+      sum='问题本身不太落在 Agent 的甜区 —— 先用传统方案或工具化解决，别急着上 Agent。';
+      why.push('三个甜区只命中 '+fmtHits(c.z.hits)+'/3（需命中 2 个及以上）：'+zDesc(c));
+      why.push('「适合做 Agent」只是第一步，这一关没过，后面不用急着判。');
+      next.push('先确认是不是真甜区：用户是否真的说不清需求 / 是否真的要跨系统调工具做事 / 是否真需要多轮澄清');
+      next.push('若甜区确实只有 1 个，优先做「工具化」：把系统接口 + 固定流程做透，成本低得多');
+      next.push('若仍想上 Agent，请在「人工补充结论」写明理由，并从最小试点开始');
+      return {badge:badge,label:label,sum:sum,why:why,next:next};
+    }
+
+    // 三道可行性关卡
+    if(c.answered<6) missing.push('三道关卡还有 '+(6-c.answered)+' 项未选');
+    if(c.tested<10) missing.push('10 题检查还有 '+(10-c.tested)+' 题未判');
+    if(missing.length){
+      badge='todo'; label='待补全';
+      sum='还差：'+missing.join('；');
+      why.push('甜区已过（命中 '+fmtHits(c.z.hits)+'/3），把剩下几项判完，结论区会自动给出该走哪条路。');
+      next.push('先判「一、数据可得性」—— 它永远排第一位');
+      next.push('10 题每题三个子检查：存在 / 准确 / 可接入，三格全 ✓ 才算这题能用');
+      next.push('每个维度写下证据，不要只勾不写');
+      return {badge:badge,label:label,sum:sum,why:why,next:next};
+    }
+
+    // ① 数据可得性（永远排第一位）
+    if(!c.d2.pass){
+      badge='build'; label='先建数据';
+      sum='场景可行，但数据还没到位 —— 现在做 Agent 只会做出一个会说漂亮话的错误答案。';
+      var d=[];
+      if(c.q.d2a==='no') d.push('答案数据取不到');
+      if(c.q.d2b==='no') d.push('数据不新鲜或口径不一致');
+      if(c.usable<state.thr) d.push('10 题里只有 '+c.usable+' 题三格全 ✓，低于达标线 '+state.thr);
+      why.push('数据可得性未通过：'+d.join('；')+'。');
+      why.push('数据可得性永远排第一位：数据不对，模型越强错得越自信。');
+      var weakest = '可接入';
+      if(c.exPass<=c.okPass && c.exPass<=c.accPass) weakest='存在';
+      else if(c.accPass<=c.okPass) weakest='准确';
+      next.push('先补最弱的一环：本题 存在 '+c.exPass+'/10、准确 '+c.accPass+'/10、可接入 '+c.okPass+'/10（最弱的是「'+weakest+'」）');
+      next.push('按 10 题的失败原因倒推缺哪张表、哪个字段、哪段时效');
+      next.push('把「答案数据」落成可查、可回溯的评估集（含时间戳与口径说明）');
+      next.push('数据补齐后重跑 10 题检查，达标再进「二、任务可定义性」');
+      return {badge:badge,label:label,sum:sum,why:why,next:next};
+    }
+
+    // ② 任务可定义性
+    if(!c.d3.pass){
+      badge='research'; label='先做调研';
+      sum='任务「做对了」的标准没说清 —— 现在做 Agent，验收无从下手。';
+      why.push('2.1 或 2.2 未通过：无法一句话定义「做对了」，或标准主观、无法自动核验。');
+      why.push('连验收标准都没有，试点结果好坏都判不出来。');
+      next.push('先和业务方对齐一句话验收标准，写进「二」的备注栏');
+      next.push('把主观标准拆成可核验的客观项（命中条数 / 字段一致 / 引用完整）');
+      next.push('对齐后再回本表重判，达标才进「三、流程编排」');
+      return {badge:badge,label:label,sum:sum,why:why,next:next};
+    }
+
+    // ③ 流程编排：先 Workflow，再 Agent
+    if(c.q.d4a==='A'){
+      badge='simple'; label='用 Workflow，不加 Agent';
+      sum='流程固定、规则能写死 —— 这一档不需要 Agent，Workflow 就是最优解。';
+      why.push('编排路线选了 A（全 Workflow）：步骤确定可预测，每步都是确定逻辑。');
+      why.push('三道可行性关卡都过，但自主性没有用武之地，加 Agent 只会牺牲稳定性。');
+      next.push('按固定流程实现，每步用代码固化 + 程序化校验');
+      next.push('如果只是为了「有个 AI 入口」，在关键步骤后加一个模型辅助（可解释、可人工覆盖）');
+      next.push('等流程本身出现分支与模糊判断，再升到 B 档');
+      return {badge:badge,label:label,sum:sum,why:why,next:next};
+    }
+    if(c.q.d4a==='B'){
+      badge='build'; label='先 Workflow，Agent 做单点';
+      sum='推荐起点：流程用 Workflow 固化，只把其中 1~2 个模糊步骤交给 Agent。';
+      why.push('三道可行性关卡都过，编排走 B 档：流程固定，中间某一步需要模型判断。');
+      why.push('「先 Workflow，再 Agent，逐步增加自主性」—— B 档是把不确定性关进一个小口子。');
+      next.push('把流程拆成：确定性步骤用代码固化，只把模糊那一步交给 Agent');
+      next.push('Agent 输出后加一道程序化校验（规则 / 取值范围 / 引用完整性）');
+      next.push('上线后用 10 题回归集 + 人工改判率决定要不要升到 C 档');
+      if(c.q.d4b==='high') next.push('出错后果不可接受：这一档也必须加人工确认闸门，不能直接对外');
+      else if(c.q.d4b==='mid') next.push('出错需人工兜底：明确兜底责任人与 SLA');
+      return {badge:badge,label:label,sum:sum,why:why,next:next};
+    }
+    badge='go'; label='立即启动';
+    sum='甜区命中 '+fmtHits(c.z.hits)+'/3，三道关卡全过，编排走 C 档，可以进开发与试点。';
+    why.push('甜区命中 '+fmtHits(c.z.hits)+'/3：'+zDesc(c));
+    why.push('数据可得性通过：答案数据可取且够新，10 题 '+c.usable+'/10 三格全 ✓（存在 '+c.exPass+'/准确 '+c.accPass+'/可接入 '+c.okPass+'）');
+    why.push('任务可定义性通过：「做对了」有客观可核验的标准');
+    why.push('流程编排走 C 档：步骤随输入变化，需要 Agent 自主编排');
+    next.push('定试点范围与放量节奏，先小流量 + 人工复核双轨跑');
+    next.push('把 10 题检查集固化成回归集，每次发版重跑');
+    if(c.q.d4b==='high') next.push('出错后果不可接受：上线前先加人工确认闸门，不要直接对外');
+    else if(c.q.d4b==='mid') next.push('出错需人工兜底：明确兜底责任人与 SLA');
+    next.push('监控口径提前定：答对率、拒答率、人工改判率');
+    return {badge:badge,label:label,sum:sum,why:why,next:next};
+  }
+
+  /* ---------- 投资倾向 ---------- */
+  function investHint(c,v){
+    if(!c.z.filled || state.excl==='') return '填完第 0 关后，这里会给出倾向。';
+    if(v.label==='先建数据') return '倾向 <b>数据层</b>：结论卡在数据可得性上（模型再强也答不对不存在/不可接入的数据），先投数据层。';
+    if(v.label==='甜区命中不足'||v.label==='用更简单方案'||v.label==='用 Workflow，不加 Agent') return '两层都先别投：这个场景更适合规则/工具化，先把流程与接口做透。';
+    if(v.label==='先做调研') return '倾向 <b>先做调研</b>：连验收标准都没有，现在投模型层或数据层都是盲投。';
+    if(v.label==='先 Workflow，Agent 做单点') return '倾向 <b>工程层（少量模型投入）</b>：数据已就位、任务可验证，先用最小模型用量打通单点闭环。';
+    if(v.label==='结论冲突 · 需复核') return '先复核第 0 关的甜区判断，再谈投模型层还是数据层。';
+    if(v.label==='立即启动') return '倾向 <b>模型层 + 护栏</b>：数据和标准都已就位，此时模型侧的收益才体现得出来。';
+    return '填完前面的判定后，这里会给出倾向。';
+  }
+
+  /* ---------- 渲染 ---------- */
+  function render(){
+    var c=compute(), v=verdict(c);
+    document.getElementById('fill').style.width = (c.done/c.total*100)+'%';
+    document.getElementById('pcount').textContent = '已判断 '+c.done+' / '+c.total+' 项';
+    document.getElementById('score').textContent = c.usable;
+    document.getElementById('detail').textContent = '存在 '+c.exPass+'/10 · 准确 '+c.accPass+'/10 · 可接入 '+c.okPass+'/10';
+    var se=document.getElementById('scorestate');
+    se.textContent = c.tested<10 ? ('已判 '+c.tested+'/10') : (c.usable>=state.thr? '达标 ✓' : '未达标');
+    se.style.color = c.tested<10 ? 'var(--ink3)' : (c.usable>=state.thr?'var(--ok)':'var(--bad)');
+
+    var cz=document.getElementById('chip-z');
+    if(!c.z.filled || state.excl===''){ cz.className='chip todo'; cz.textContent='待填'; }
+    else if(state.excl==='yes'){ cz.className='chip bad'; cz.textContent='规则能写死 · 排除'; }
+    else if(c.z.hits>=2){ cz.className='chip ok'; cz.textContent='命中 '+fmtHits(c.z.hits)+'/3'; }
+    else { cz.className='chip bad'; cz.textContent='命中 '+fmtHits(c.z.hits)+'/3（不足 2）'; }
+    var zs=document.getElementById('zsum');
+    if(!c.z.filled){ zs.textContent='甜区未判完：先看这三个 —— 命中 2 个及以上，才值得往下做可行性评估。'; }
+    else if(state.excl==='yes'){ zs.innerHTML='规则能写死 → <b>直接排除</b>，不用 Agent。'; }
+    else if(c.z.hits>=2){ zs.innerHTML='命中 <b>'+fmtHits(c.z.hits)+'/3</b>（'+esc(zDesc(c))+'）→ 值得往下过三道可行性关卡。'; }
+    else { zs.innerHTML='命中 <b>'+fmtHits(c.z.hits)+'/3</b>（'+esc(zDesc(c))+'）→ 不足 2 个，先看是不是「工具化 / 规则化」更划算。'; }
+
+    function chip(id, filled, pass, label){
+      var el=document.getElementById(id); el.className='chip';
+      if(!filled){ el.className='chip todo'; el.textContent=label+' · 待填'; }
+      else if(pass){ el.className='chip ok'; el.textContent=label+' · 通过'; }
+      else { el.className='chip bad'; el.textContent=label+' · 不通过'; }
+    }
+    chip('chip-d2', c.d2.filled, c.d2.pass, '数据可得性');
+    chip('chip-d3', c.d3.filled, c.d3.pass, '任务可定义性');
+    var c4=document.getElementById('chip-d4');
+    if(c.d4.filled){ c4.className='chip ok'; c4.textContent='流程编排 · '+ROUTE[c.q.d4a]; }
+    else { c4.className='chip todo'; c4.textContent='流程编排 · 待填'; }
+
+    var npass=[c.d2.pass,c.d3.pass].filter(function(x){return x;}).length;
+    document.getElementById('chips').innerHTML =
+      '<span class="chip '+(c.z.filled? (c.z.hits>=2?'ok':'bad') : 'todo')+'">甜区 '+fmtHits(c.z.hits)+'/3</span>'+
+      '<span class="chip '+(c.tested>=10? (c.usable>=state.thr?'ok':'bad') : 'todo')+'">10 题可用 '+c.usable+'/10</span>'+
+      '<span class="chip '+(c.d2.filled&&c.d3.filled? (npass===2?'ok':'bad') : 'todo')+'">关卡通过 '+npass+'/2</span>';
+
+    var b=document.getElementById('badge'); b.className='badge '+v.badge; b.textContent=v.label;
+    document.getElementById('summary').textContent=v.sum;
+    document.getElementById('why').innerHTML=v.why.map(function(x){return '<li>'+esc(x)+'</li>';}).join('');
+    document.getElementById('next').innerHTML=v.next.map(function(x){return '<li>'+esc(x)+'</li>';}).join('');
+    document.getElementById('sug').innerHTML = investHint(c,v);
+    var gp=document.getElementById('genpanel');
+    if(gp && !gp.hidden){ document.getElementById('gentext').textContent = buildConclusion(); }
+  }
+
+  /* ---------- 复制 / 导出 / 导入 / 打印 / 重置 ---------- */
+  function weakestOf(c){
+    var w='可接入';
+    if(c.exPass<=c.okPass && c.exPass<=c.accPass) w='存在';
+    else if(c.accPass<=c.okPass) w='准确';
+    return w;
+  }
+  function buildConclusion(){
+    var c=compute(), v=verdict(c);
+    var L=[], scene=state.meta.scene||'(未填场景)';
+    L.push('【评审结论】'+scene);
+    L.push('日期：'+(state.meta.date||'—')+'　评审人：'+(state.meta.reviewer||'—'));
+    L.push('');
+    L.push('结论：'+(v.badge==='go'?'可以进入开发与试点':'暂不启动')+'（'+v.label+'）');
+    L.push(v.sum);
+    L.push('');
+    L.push('依据（均由本表已勾选项汇总，未做额外推断）：');
+    if(!c.z.filled || state.excl===''){
+      L.push('1. 第 0 关未判完：甜区已判 '+c.z.done+'/3'+(state.excl===''?'，排除项（能否 if-else 完整描述）未选':'')+'。');
+    } else {
+      L.push('1. 第 0 关：甜区命中 '+fmtHits(c.z.hits)+'/3（'+zDesc(c)+'）；排除项判定「'+(state.excl==='yes'?'是，规则能写死':'否，规则写不完')+'」。');
+    }
+    L.push('2. 数据可得性：10 题已判 '+c.tested+' 题，三格全 ✓ '+c.usable+' 题（达标线 '+state.thr+'，'+(c.usable>=state.thr?'已达标':'未达标')+'）；存在 '+c.exPass+'、准确 '+c.accPass+'、可接入 '+c.okPass+'，最弱是「'+weakestOf(c)+'」。');
+    if(c.d3.filled){
+      L.push('3. 任务可定义性：'+(c.q.d3a==='yes'?'能一句话说清「做对了」':'说不清「做对了」')+'，评估标准'+(c.q.d3b==='yes'?'客观、可自动核验':'偏主观、依赖人工判断')+'。');
+    } else { L.push('3. 任务可定义性：未判。'); }
+    if(c.d4.filled){
+      L.push('4. 流程编排：选了 '+ROUTE[c.q.d4a]+'，出错后果「'+({low:'可容忍',mid:'需人工复核',high:'不可接受'}[c.q.d4b]||'未选')+'」。');
+    } else { L.push('4. 流程编排：未选。'); }
+
+    var conf=[];
+    if(state.excl==='yes' && (c.q.d4a==='B'||c.q.d4a==='C')) conf.push('第 0 关判定「规则能写死」，但流程编排选了 '+ROUTE[c.q.d4a]+'（要模型参与）—— 两条互相打架，需明确以哪条为准。');
+    if(state.excl==='no' && c.z.filled && c.z.hits<2) conf.push('甜区只命中 '+fmtHits(c.z.hits)+'/3，但排除项判定「规则写不完」—— 建议回第 0 关复核甜区判断。');
+    if(conf.length){ L.push(''); L.push('⚠ 需确认：'); conf.forEach(function(x,i){L.push('　'+(i+1)+'. '+x);}); }
+
+    var miss=[];
+    if(!c.z.filled) miss.push('甜区还有 '+(3-c.z.done)+' 项未判');
+    if(state.excl==='') miss.push('排除项未选');
+    if(c.tested<10) miss.push('10 题还有 '+(10-c.tested)+' 题未判');
+    if(c.answered<6) miss.push('可行性关卡还有 '+(6-c.answered)+' 项未选');
+    var emptyEv=0;
+    ['ex1','ex2','ex3'].forEach(function(k){ if(!state.zone[k]) emptyEv++; });
+    ['d2','d3','d4'].forEach(function(k){ if(!state.notes[k]) emptyEv++; });
+    if(emptyEv) miss.push('证据 / 备注栏空着 '+emptyEv+' 处（判定还没有依据）');
+    if(!state.meta.action) miss.push('未写人工补充结论');
+    if(miss.length){ L.push(''); L.push('待补：'); miss.forEach(function(x,i){L.push('　'+(i+1)+'. '+x);}); }
+
+    L.push('');
+    L.push('下一步：');
+    v.next.forEach(function(x,i){ L.push('　'+(i+1)+'. '+x); });
+
+    if(state.meta.action){ L.push(''); L.push('人工补充：'+state.meta.action); }
+    L.push('');
+    L.push('投资倾向（模型层 vs 数据层）：'+(state.meta.invest||'待团队讨论'));
+    return L.join('\n');
+  }
+
+  function buildText(){
+    var c=compute(), v=verdict(c);
+    var L=[];
+    L.push('【Agent 场景评估】'+(state.meta.scene||'(未填场景)'));
+    L.push('评审人：'+(state.meta.reviewer||'—')+'　日期：'+(state.meta.date||'—'));
+    L.push('');
+    L.push('第 0 关 · 是不是甜区');
+    ZONE.forEach(function(zd){
+      var val=state.zone[zd.key];
+      L.push('　'+zd.name+'：'+(val==='yes'?'命中':val==='partial'?'部分命中':val==='no'?'不命中':'未判')+(state.zone[zd.ex]?('　'+state.zone[zd.ex]):''));
+    });
+    L.push('　排除项 · 能否 if-else 完整描述：'+(state.excl==='yes'?'是（规则能写死）':state.excl==='no'?'否（规则写不完）':'未选'));
+    L.push('　→ 甜区命中 '+fmtHits(c.z.hits)+'/3');
+    L.push('');
+    L.push('一、数据可得性（永远排第一位）');
+    L.push('　1.1 答案数据存在：'+yn(state.q.d2a)+'　1.2 数据最新：'+yn(state.q.d2b));
+    L.push('　1.3 10 题检查：可用 '+c.usable+'/10（存在 '+c.exPass+' · 准确 '+c.accPass+' · 可接入 '+c.okPass+'），达标线 '+state.thr);
+    state.test.forEach(function(t,i){ if(t.q||t.ex||t.acc||t.ok){ L.push('　　'+(i+1)+'. '+(t.q||'（未写问题）')+' → 存在'+mk(t.ex)+' 准确'+mk(t.acc)+' 可接入'+mk(t.ok)+(t.note?('　'+t.note):'')); } });
+    if(state.notes.d2) L.push('　证据：'+state.notes.d2);
+    L.push('二、任务可定义性');
+    L.push('　2.1 能否一句话说清「做对了」：'+yn(state.q.d3a)+'　2.2 评估标准客观：'+yn(state.q.d3b));
+    if(state.notes.d3) L.push('　标准：'+state.notes.d3);
+    L.push('三、流程编排');
+    L.push('　3.1 编排路线：'+(ROUTE[state.q.d4a]||'未选')+'　3.2 出错后果：'+({low:'可容忍',mid:'需人工复核',high:'不可接受'}[state.q.d4b]||'—'));
+    if(state.notes.d4) L.push('　证据：'+state.notes.d4);
+    L.push('');
+    L.push('结论：'+v.label+' —— '+v.sum);
+    v.why.forEach(function(x){L.push('　· '+x);});
+    L.push('下一步：');
+    v.next.forEach(function(x,i){L.push('　'+(i+1)+'. '+x);});
+    if(state.meta.action){ L.push(''); L.push('补充结论：'+state.meta.action); }
+    L.push('');
+    L.push('投资倾向（模型层 vs 数据层）：'+(state.meta.invest||'（待团队讨论）'));
+    return L.join('\n');
+  }
+  function mk(v){ return v==='pass'?'✓':v==='fail'?'✗':'—'; }
+  function yn(v){ return v==='yes'?'是':v==='no'?'否':'待填'; }
+
+  document.addEventListener('click', function(e){
+    var b=e.target.closest ? e.target.closest('button[data-act]') : null; if(!b) return;
+    var act=b.dataset.act;
+    if(act==='copy'){
+      var txt=buildText();
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(txt).then(function(){ flash(b,'已复制'); }, function(){ fallbackCopy(txt); flash(b,'已复制'); });
+      } else { fallbackCopy(txt); flash(b,'已复制'); }
+    }
+    else if(act==='print'){ window.print(); }
+    else if(act==='gen'){
+      document.getElementById('gentext').textContent = buildConclusion();
+      var gp=document.getElementById('genpanel'); gp.hidden=false;
+      gp.scrollIntoView({block:'nearest'});
+      flash(b,'已生成');
+    }
+    else if(act==='gencopy'){
+      var gt=document.getElementById('gentext').textContent;
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(gt).then(function(){ flash(b,'已复制'); }, function(){ fallbackCopy(gt); flash(b,'已复制'); });
+      } else { fallbackCopy(gt); flash(b,'已复制'); }
+    }
+    else if(act==='genhide'){ document.getElementById('genpanel').hidden = true; }
+    else if(act==='export'){
+      var blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+      var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+      a.download=(state.meta.scene||'agent-scene-checklist')+'.json'; a.click(); URL.revokeObjectURL(a.href);
+    }
+    else if(act==='import'){ document.getElementById('filein').click(); }
+    else if(act==='reset'){
+      if(!confirm('清空当前填写内容？此操作不可撤销。')) return;
+      localStorage.removeItem(KEY);
+      state.meta={scene:'',reviewer:'',date:'',action:'',invest:''};
+      state.q={d2a:'',d2b:'',d3a:'',d3b:'',d4a:'',d4b:''};
+      state.zone={s1:'',s2:'',s3:'',ex1:'',ex2:'',ex3:''};
+      state.excl='';
+      state.test=Array.from({length:10},function(){return {q:'',ex:'',acc:'',ok:'',note:''};});
+      state.notes={d2:'',d3:'',d4:''}; state.thr=8;
+      fill(); render(); flash(b,'已清空');
+    }
+  });
+  function fallbackCopy(txt){
+    var ta=document.createElement('textarea'); ta.value=txt; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta);
+  }
+  function flash(b,t){ var o=b.textContent; b.textContent=t; setTimeout(function(){ b.textContent=o; },1400); }
+
+  document.getElementById('filein').addEventListener('change', function(e){
+    var f=e.target.files[0]; if(!f) return;
+    var rd=new FileReader();
+    rd.onload=function(){
+      try{
+        var s=JSON.parse(rd.result);
+        if(s.meta) Object.assign(state.meta,s.meta);
+        if(s.q) Object.assign(state.q,s.q);
+        if(s.zone) Object.assign(state.zone,s.zone);
+        if(typeof s.excl==='string') state.excl=s.excl;
+        if(s.notes) Object.assign(state.notes,s.notes);
+        if(typeof s.thr==='number') state.thr=s.thr;
+        if(Array.isArray(s.test)) s.test.forEach(function(t,j){ if(state.test[j]) state.test[j]=t; });
+        save(); fill(); render();
+      }catch(err){ alert('文件解析失败，请确认是本工具导出的 JSON。'); }
+    };
+    rd.readAsText(f);
+    e.target.value='';
+  });
+
+  load(); fill(); render();
+})();
+</script>
+</body>
+</html>
