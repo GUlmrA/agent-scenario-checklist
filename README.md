@@ -22,7 +22,7 @@
 
 单文件 HTML，无构建、无后端、无外部依赖，双击就能用；勾选状态存在本机浏览器，不上传任何服务器。
 
-**在线地址：<https://rrd3xerf.qwenwork.host/>**（直接打开，不用装任何东西）
+**在线地址：<https://gulmra.github.io/agent-scenario-checklist/>**（直接打开，不用装任何东西）
 
 ![界面预览](preview.png)
 
